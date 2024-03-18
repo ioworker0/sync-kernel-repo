@@ -24,9 +24,13 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
-      
+
+    - name: clone-test-repo
+      run: |      
+        git clone git://git@github.com:ioworker0/sync-kernel-repo.git
+        
     - name: clone-apkm-repo
-      run: |        
+      run: |      
         git clone git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
 
     - name: sync-repo
