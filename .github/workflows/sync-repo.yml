@@ -31,7 +31,7 @@ jobs:
         
     - name: clone-apkm-repo
       run: |      
-        git clone git.kernel.org/pub/scm/linux/kernel/git/akpm/mm.git
+        git clone git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
 
     - name: sync-repo
       run: |        
