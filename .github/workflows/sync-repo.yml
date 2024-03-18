@@ -1,0 +1,40 @@
+name: SYNC REPO
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      # Give the default GITHUB_TOKEN write permission.
+      # https://github.blog/changelog/2023-02-02-github-actions-updating-the-default-github_token-permissions-to-read-only/
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+        path: sync-repo
+
+    - name: Use SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+      
+    - name: clone-apkm-repo
+      run: |        
+        git clone git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
+
+    - name: sync-repo
+      run: |        
+        cd mm
+        git checkout mm-stable && git pull
+        git checkout mm-unstable && git pull
+        git push -f --all git@github.com:ioworker0/linux.git
+      
+
+      
