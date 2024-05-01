@@ -1,12 +1,8 @@
 name: SYNC REPO
 
 on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-  # schedule:
-  #   - cron: '0 * * * *'  # Runs every hour.
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour.
 
 jobs:
   build:
