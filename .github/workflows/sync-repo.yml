@@ -2,21 +2,18 @@ name: SYNC REPO
 
 on:
   schedule:
-    - cron: '0 22,10 * * *'  # 北京时间早上6点和晚上6点分别为UTC时间22点和10点
+    - cron: '0 * * * *'  # Runs every hour.
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     permissions:
-      # Give the default GITHUB_TOKEN write permission.
-      # https://github.blog/changelog/2023-02-02-github-actions-updating-the-default-github_token-permissions-to-read-only/
       contents: write
 
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: main
         path: sync-repo
 
     - name: use SSH key
@@ -25,13 +22,24 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
 
-    - name: clone apkm repo
-      run: |      
+    - uses: actions/cache@v4
+      id: repo-cache
+      with:
+        path: .
+        key: linux
+
+    - name: clone repo
+      if: steps.repo-cache.outputs.cache-hit != 'true'
+      run: |
         git clone -v git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
 
     - name: sync linux repo
       run: |        
         cd mm
+        if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
+            git branch -D mm-unstable
+        fi
+        git checkout master && git pull
         git checkout mm-stable && git pull
         git checkout mm-unstable && git pull
         git push -f --all git@github.com:ioworker0/linux.git
