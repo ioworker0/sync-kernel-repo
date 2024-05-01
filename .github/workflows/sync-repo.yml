@@ -1,8 +1,10 @@
 name: SYNC REPO
 
 on:
-  schedule:
-    - cron: '0 * * * *'  # Runs every hour.
+  push:
+    branches: ["main"]
+  # schedule:
+  #   - cron: '0 * * * *'  # Runs every hour.
 
 jobs:
   build:
@@ -36,6 +38,7 @@ jobs:
     - name: sync linux repo
       run: |        
         cd mm
+        git checkout master
         if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
             git branch -D mm-unstable
         fi
