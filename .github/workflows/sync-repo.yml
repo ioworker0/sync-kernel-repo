@@ -45,7 +45,7 @@ jobs:
         git checkout mm-unstable && git pull
         git push -f --all git@github.com:ioworker0/linux.git
       
-    - name: check against the commit ID
+    - name: keepalive
       run: |
         cd sync-repo
         date > hello_world.txt
