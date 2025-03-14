@@ -40,7 +40,11 @@ jobs:
         if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
             git branch -D mm-unstable
         fi
+        if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
+            git branch -D mm-nonmm-unstable
+        fi
         git checkout master && git pull
         git checkout mm-stable && git pull
         git checkout mm-unstable && git pull
+        git checkout mm-nonmm-unstable && git pull
         git push -f --all git@github.com:ioworker0/linux.git
