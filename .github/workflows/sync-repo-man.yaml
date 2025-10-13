@@ -21,45 +21,23 @@ jobs:
         echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
         chmod 600 ~/.ssh/id_rsa
 
-    - uses: actions/cache@v4
-      id: repo-cache
-      with:
-        path: .
-        key: linux
-
     - name: clone repo
-      if: steps.repo-cache.outputs.cache-hit != 'true'
       run: |
-        git clone -v git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
+        git clone -v git://git.kernel.org/pub/scm/linux/kernel/git/stable/linux
 
     - name: sync linux repo
       run: |        
-        cd mm
+        cd linux
         git checkout master
-        if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
-            git branch -D mm-unstable
-        fi
-        if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
-            git branch -D mm-nonmm-unstable
-        fi
-        if git rev-parse --verify mm-new >/dev/null 2>&1; then
-            git branch -D mm-new
-        fi
-        # if git rev-parse --verify linux-6.6.y >/dev/null 2>&1; then
-        #     git branch -D linux-6.6.y
-        # fi
-        # if git rev-parse --verify linux-6.12.y >/dev/null 2>&1; then
-        #     git branch -D linux-6.12.y
-        # fi
-        # if git rev-parse --verify linux-6.1.y >/dev/null 2>&1; then
-        #     git branch -D linux-6.1.y
-        # fi
         git checkout master && git pull
-        git checkout mm-stable && git pull
-        git checkout mm-unstable && git pull
-        git checkout mm-nonmm-unstable && git pull
-        git checkout mm-new && git pull
-        git checkout linux-6.6.y && git pull
+        # 1. 处理 linux-6.6.y 分支
+        git checkout linux-6.6.y && git pull  # 拉取远程最新内容（避免冲突）
+        git push -f git@github.com:ioworker0/linux.git linux-6.6.y
+
+        # 2. 处理 linux-6.12.y 分支
         git checkout linux-6.12.y && git pull
+        git push -f git@github.com:ioworker0/linux.git linux-6.12.y
+
+        # 3. 处理 linux-6.1.y 分支
         git checkout linux-6.1.y && git pull
-        git push -f --all git@github.com:ioworker0/linux.git
+        git push -f git@github.com:ioworker0/linux.git linux-6.1.y
