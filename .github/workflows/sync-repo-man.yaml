@@ -45,15 +45,15 @@ jobs:
         if git rev-parse --verify mm-new >/dev/null 2>&1; then
             git branch -D mm-new
         fi
-        if git rev-parse --verify linux-6.6.y >/dev/null 2>&1; then
-            git branch -D linux-6.6.y
-        fi
-        if git rev-parse --verify linux-6.12.y >/dev/null 2>&1; then
-            git branch -D linux-6.12.y
-        fi
-        if git rev-parse --verify linux-6.1.y >/dev/null 2>&1; then
-            git branch -D linux-6.1.y
-        fi
+        # if git rev-parse --verify linux-6.6.y >/dev/null 2>&1; then
+        #     git branch -D linux-6.6.y
+        # fi
+        # if git rev-parse --verify linux-6.12.y >/dev/null 2>&1; then
+        #     git branch -D linux-6.12.y
+        # fi
+        # if git rev-parse --verify linux-6.1.y >/dev/null 2>&1; then
+        #     git branch -D linux-6.1.y
+        # fi
         git checkout master && git pull
         git checkout mm-stable && git pull
         git checkout mm-unstable && git pull
