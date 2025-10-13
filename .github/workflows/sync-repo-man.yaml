@@ -1,0 +1,65 @@
+name: SYNC REPO MAN
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: sync-repo
+
+    - name: use SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - uses: actions/cache@v4
+      id: repo-cache
+      with:
+        path: .
+        key: linux
+
+    - name: clone repo
+      if: steps.repo-cache.outputs.cache-hit != 'true'
+      run: |
+        git clone -v git://git.kernel.org/pub/scm/linux/kernel/git/akpm/mm
+
+    - name: sync linux repo
+      run: |        
+        cd mm
+        git checkout master
+        if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
+            git branch -D mm-unstable
+        fi
+        if git rev-parse --verify mm-unstable >/dev/null 2>&1; then
+            git branch -D mm-nonmm-unstable
+        fi
+        if git rev-parse --verify mm-new >/dev/null 2>&1; then
+            git branch -D mm-new
+        fi
+        if git rev-parse --verify linux-6.6.y >/dev/null 2>&1; then
+            git branch -D linux-6.6.y
+        fi
+        if git rev-parse --verify linux-6.12.y >/dev/null 2>&1; then
+            git branch -D linux-6.12.y
+        fi
+        if git rev-parse --verify linux-6.1.y >/dev/null 2>&1; then
+            git branch -D linux-6.1.y
+        fi
+        git checkout master && git pull
+        git checkout mm-stable && git pull
+        git checkout mm-unstable && git pull
+        git checkout mm-nonmm-unstable && git pull
+        git checkout mm-new && git pull
+        git checkout linux-6.6.y && git pull
+        git checkout linux-6.12.y && git pull
+        git checkout linux-6.1.y && git pull
+        git push -f --all git@github.com:ioworker0/linux.git
