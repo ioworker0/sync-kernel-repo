@@ -1,0 +1,34 @@
+name: SYNC REPO LINUX NEXT MAN
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        path: sync-repo
+
+    - name: use SSH key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+
+    - name: clone repo
+      run: |
+        git clone -v git://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next
+
+    - name: sync linux repo
+      run: |        
+        cd linux
+        git checkout master
+        git checkout master && git pull
+        # 1. 处理 linux-next 分支
+        git push -f git@github.com:ioworker0/linux.git linux-next
