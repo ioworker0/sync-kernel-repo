@@ -30,5 +30,6 @@ jobs:
         cd linux-next
         git checkout master
         git checkout master && git pull
+        git checkout -b linux-next
         # 1. 处理 linux-next 分支
         git push -f git@github.com:ioworker0/linux.git linux-next
