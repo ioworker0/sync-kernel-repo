@@ -27,7 +27,7 @@ jobs:
 
     - name: sync linux repo
       run: |        
-        cd linux
+        cd linux-next
         git checkout master
         git checkout master && git pull
         # 1. 处理 linux-next 分支
