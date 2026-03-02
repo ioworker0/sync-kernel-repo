@@ -41,3 +41,7 @@ jobs:
         # 3. 处理 linux-6.1.y 分支
         git checkout linux-6.1.y && git pull
         git push -f git@github.com:ioworker0/linux.git linux-6.1.y
+
+        # 4. 处理 linux-5.15.y 分支
+        git checkout linux-5.15.y && git pull
+        git push -f git@github.com:ioworker0/linux.git linux-5.15.y
