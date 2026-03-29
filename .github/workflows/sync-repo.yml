@@ -2,7 +2,7 @@ name: SYNC REPO
 
 on:
   schedule:
-    - cron: '*/60 * * * *'  # Runs every 60 minutes.
+    - cron: '0 * * * *'  # Runs every 60 minutes.
 
 jobs:
   build:
@@ -16,11 +16,20 @@ jobs:
       with:
         path: sync-repo
 
-    - name: use SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+    # - name: use SSH key
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+    #     chmod 600 ~/.ssh/id_rsa
+    - name: Create GitHub App token for target repo
+      id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.SYNC_APP_ID }}
+        private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+        owner: ioworker0
+        repositories: linux
+        permission-contents: write
 
     - uses: actions/cache@v4
       id: repo-cache
@@ -63,4 +72,6 @@ jobs:
         git checkout linux-6.6.y && git pull
         git checkout linux-6.12.y && git pull
         git checkout linux-6.1.y && git pull
-        git push -f --all git@github.com:ioworker0/linux.git
+        
+        git push --force --all \
+            https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git
