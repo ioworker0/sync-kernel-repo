@@ -15,11 +15,20 @@ jobs:
       with:
         path: sync-repo
 
-    - name: use SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+    # - name: use SSH key
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+    #     chmod 600 ~/.ssh/id_rsa
+    - name: Create GitHub App token for target repo
+      id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.SYNC_APP_ID }}
+        private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+        owner: ioworker0
+        repositories: linux
+        permission-contents: write
 
     - name: clone repo
       run: |
@@ -30,18 +39,42 @@ jobs:
         cd linux
         git checkout master
         git checkout master && git pull
-        # 1. 处理 linux-6.6.y 分支
-        git checkout linux-6.6.y && git pull  # 拉取远程最新内容（避免冲突）
-        git push -f git@github.com:ioworker0/linux.git linux-6.6.y
+        # # 1. 处理 linux-6.6.y 分支
+        # git checkout linux-6.6.y && git pull  # 拉取远程最新内容（避免冲突）
+        # git push -f git@github.com:ioworker0/linux.git linux-6.6.y
 
-        # 2. 处理 linux-6.12.y 分支
-        git checkout linux-6.12.y && git pull
-        git push -f git@github.com:ioworker0/linux.git linux-6.12.y
+        # # 2. 处理 linux-6.12.y 分支
+        # git checkout linux-6.12.y && git pull
+        # git push -f git@github.com:ioworker0/linux.git linux-6.12.y
 
-        # 3. 处理 linux-6.1.y 分支
-        git checkout linux-6.1.y && git pull
-        git push -f git@github.com:ioworker0/linux.git linux-6.1.y
+        # # 3. 处理 linux-6.1.y 分支
+        # git checkout linux-6.1.y && git pull
+        # git push -f git@github.com:ioworker0/linux.git linux-6.1.y
 
-        # 4. 处理 linux-5.15.y 分支
-        git checkout linux-5.15.y && git pull
-        git push -f git@github.com:ioworker0/linux.git linux-5.15.y
+        # # 4. 处理 linux-5.15.y 分支
+        # git checkout linux-5.15.y && git pull
+        # git push -f git@github.com:ioworker0/linux.git linux-5.15.y
+        
+        git checkout linux-6.6.y
+        git pull
+        git push --force \
+          https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git \
+          HEAD:refs/heads/linux-6.6.y
+
+        git checkout linux-6.12.y
+        git pull
+        git push --force \
+          https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git \
+          HEAD:refs/heads/linux-6.12.y
+
+        git checkout linux-6.1.y
+        git pull
+        git push --force \
+          https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git \
+          HEAD:refs/heads/linux-6.1.y
+
+        git checkout linux-5.15.y
+        git pull
+        git push --force \
+          https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git \
+          HEAD:refs/heads/linux-5.15.y
