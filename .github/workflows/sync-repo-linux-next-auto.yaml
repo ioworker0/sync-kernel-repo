@@ -17,11 +17,21 @@ jobs:
       with:
         path: sync-repo
 
-    - name: use SSH key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
+    # - name: use SSH key
+    #   run: |
+    #     mkdir -p ~/.ssh
+    #     echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+    #     chmod 600 ~/.ssh/id_rsa
+    
+    - name: Create GitHub App token for target repo
+      id: app-token
+      uses: actions/create-github-app-token@v2
+      with:
+        app-id: ${{ vars.SYNC_APP_ID }}
+        private-key: ${{ secrets.SYNC_APP_PRIVATE_KEY }}
+        owner: ioworker0
+        repositories: linux
+        permission-contents: write
 
     - name: clone repo
       run: |
@@ -33,4 +43,7 @@ jobs:
         git checkout master
         git checkout master && git pull
         git checkout -B linux-next
-        git push -f git@github.com:ioworker0/linux.git linux-next
+        # git push -f git@github.com:ioworker0/linux.git linux-next
+        git push --force \
+            https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git \
+            HEAD:refs/heads/linux-next
