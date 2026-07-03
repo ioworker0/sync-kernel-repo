@@ -54,7 +54,13 @@ jobs:
         # # 4. 处理 linux-5.15.y 分支
         # git checkout linux-5.15.y && git pull
         # git push -f git@github.com:ioworker0/linux.git linux-5.15.y
-        
+
+        git checkout linux-7.1.y
+        git pull
+        git push --force \
+          https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/ioworker0/linux.git \
+          HEAD:refs/heads/linux-7.1.y
+          
         git checkout linux-6.6.y
         git pull
         git push --force \
