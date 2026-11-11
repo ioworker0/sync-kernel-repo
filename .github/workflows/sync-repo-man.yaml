@@ -40,7 +40,7 @@ jobs:
         cd linux
         git checkout master
         git pull --ff-only
-        for branch in linux-7.2.y linux-6.18.y linux-6.12.y linux-6.6.y linux-6.1.y linux-5.15.y linux-5.10.y; do
+        for branch in linux-7.3.y linux-6.18.y linux-6.12.y linux-6.6.y linux-6.1.y linux-5.15.y linux-5.10.y; do
           git checkout "$branch"
           git pull --ff-only
           git push --force \
